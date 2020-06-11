@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 # This code Copyright 2012 Todd Mortimer <todd.mortimer@gmail.com>
 #
 # You may do whatever you like with this code, provided the above
@@ -20,29 +22,24 @@ then
   # fetch
   echo "Fetching binutils sources if not already present"
 pwd
-  ls -d work/$DISTVER 2>/dev/null 2>&1 || \
+  ls -d $WORKDIR/tools 2>/dev/null 2>&1 || \
 {
-  cd work/$DISTVER
-  git init
-  git config core.sparseCheckout true
-  echo "tools/binutils/branches/710_release/" >> .git/info/sparse-checkout
-  git remote add -f origin https://github.com/extrowerk/core-dev-tools.git
-  git pull origin master
+  mkdir -p $WORKROOT/$DISTVER || exit 1
+  cd $WORKDIR || exit 1
+  git init || exit 1 
+  git config core.sparseCheckout true  || exit 1
+  mkdir -p "tools/binutils/branches/710_release/" || exit 1
+  echo "tools/binutils/branches/710_release/" >> .git/info/sparse-checkout || exit 1
+  git remote add -f origin https://github.com/extrowerk/core-dev-tools.git || exit 1
+  git pull origin master || exit 1
 }
 
   TASK=build
 fi
 
 # Target have to be --target=arm-unknown-nto-qnx8.0.0eabi
-CONFIGURE_CMD="cd "tools/binutils/branches/710_release/";
-				find . -name \"config.cache\" -exec rm -rf {} \;;
-				export ac_cv_func_ftello64=no;
-				export ac_cv_func_fseeko64=no;
-				export ac_cv_func_fopen64=no;
-				export CFLAGS=\"$CFLAGS -Wno-shadow -Wno-format -Wno-sign-compare\";
-				export LIBS=\"$LIBS -liconv\";
-				export LDFLAGS=\"$LDFLAGS -liconv\";
-				$EXECDIR/work/$DISTVER/tools/binutils/branches/710_release/configure
+CONFIGURE_CMD=" find . -name \"config.cache\" -exec rm -rf {} \;;
+		   ./tools/binutils/branches/710_release/configure
                    --host=$PBHOSTARCH
                    --build=$PBBUILDARCH
                    --target=$PBTARGETARCH
@@ -56,6 +53,12 @@ CONFIGURE_CMD="cd "tools/binutils/branches/710_release/";
                    CC=$PBTARGETARCH-gcc
                    LDFLAGS='-Wl,-s '
                    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
+		   ac_cv_func_ftello64=no;
+		   ac_cv_func_fseeko64=no;
+		   ac_cv_func_fopen64=no;
+		   CFLAGS=\"$CFLAGS -Wno-shadow -Wno-format -Wno-sign-compare\";
+		   LIBS=\"$LIBS -liconv\";
+		   LDFLAGS=\"$LDFLAGS -liconv\";
                    "
 package_build
 package_install
