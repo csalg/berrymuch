@@ -10,12 +10,12 @@
 
 set -e
 source ../../lib.sh
-DISTVER="zsh-5.0.2"
-DISTSUFFIX="tar.gz"
+DISTVER="zsh-5.8"
+DISTSUFFIX="tar.xz"
 
 TASK=fetch
 
-DISTFILES="http://www.zsh.org/pub/old/$DISTVER.$DISTSUFFIX"
+DISTFILES="http://www.zsh.org/pub/$DISTVER.$DISTSUFFIX"
 UNPACKCOMD="tar -xf"
 package_init "$@"
 CONFIGURE_CMD="autoconf; ./configure 
